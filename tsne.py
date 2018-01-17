@@ -170,7 +170,7 @@ def tsne(X=np.array([]), no_dims=2, initial_dims=50, perplexity=30.0, is_tsne=Tr
     X = pca(X, initial_dims).real
     (n, d) = X.shape
 #     max_iter = 1000
-    max_iter = 200
+    max_iter = 50
     initial_momentum = 0.5
     final_momentum = 0.8
     eta = 500
@@ -207,8 +207,10 @@ def tsne(X=np.array([]), no_dims=2, initial_dims=50, perplexity=30.0, is_tsne=Tr
         # Compute gradient
         PQ = P - Q
         for i in range(n):
-            dY[i, :] = np.sum(np.tile(PQ[:, i] * num[:, i], (no_dims, 1)).T * (Y[i, :] - Y), 0)
-
+            if is_tsne:
+                dY[i, :] = np.sum(np.tile(PQ[:, i] * num[:, i], (no_dims, 1)).T * (Y[i, :] - Y), 0)
+            else:
+                dY[i, :] = np.sum(np.tile(PQ[:, i], (no_dims, 1)).T * (Y[i, :] - Y), 0) / 2
         # Perform the update
         if iter < 20:
             momentum = initial_momentum
